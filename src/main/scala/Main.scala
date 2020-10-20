@@ -61,8 +61,8 @@ object Main extends App {
 
   var t9m_b_actual, t9m_e_actual, t9d_b_actual, t9d_e_actual, t9y_b_actual, t9y_e_actual = 0
 
-  // Open the JSON for processing. Pass in a command line here once it's finalized.
-  val inputFile: Unit = Source.fromFile("C:\\Users\\Chu\\Desktop\\Movies\\movies.json").getLines.foreach {
+  // Open the JSON for processing. Currently hardcoded in, can't move the JSON outside of the /src/ directory without changing this.
+  val inputFile: Unit = Source.fromFile("movies.json").getLines.foreach {
     line: String => {
 
       // Increment the line we're checking and reset the number of extra commas and colons we've seen.
