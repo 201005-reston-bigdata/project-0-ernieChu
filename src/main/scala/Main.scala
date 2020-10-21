@@ -18,11 +18,12 @@ object Main extends App {
 
   // Demonstrate understanding of basic command line input.
   if (args.length == 0) {
-    println("No command-line arguments were entered, but continuing.")
+    println("No command-line arguments were entered, but continuing.\n")
   }
   else {
     for (a <- args) {
       println(s"The command-line argument ${a} was entered.")
+      println()
     }
   }
 
@@ -62,7 +63,7 @@ object Main extends App {
   var t9m_b_actual, t9m_e_actual, t9d_b_actual, t9d_e_actual, t9y_b_actual, t9y_e_actual = 0
 
   // Open the JSON for processing. Pass in a command line here once it's finalized.
-  val inputFile: Unit = Source.fromFile("C:\\Users\\Chu\\Desktop\\Movies\\movies.json").getLines.foreach {
+  val inputFile: Unit = Source.fromFile("movies.json").getLines.foreach {
     line: String => {
 
       // Increment the line we're checking and reset the number of extra commas and colons we've seen.
@@ -285,7 +286,7 @@ object Main extends App {
       */
 
       // Finally, insert the document.
-      printResults(master_collection.insertOne(Movie(title_from_line, domestic_gross_from_line, international_gross_from_line, budget_from_line, release_date_from_line, release_date_in_seconds_from_line, genre_from_line, director_from_line, rt_score_from_line, imdb_score_from_line, imdb_votes_from_line)))
+      getResults(master_collection.insertOne(Movie(title_from_line, domestic_gross_from_line, international_gross_from_line, budget_from_line, release_date_from_line, release_date_in_seconds_from_line, genre_from_line, director_from_line, rt_score_from_line, imdb_score_from_line, imdb_votes_from_line)))
     }
   }
 
@@ -574,8 +575,8 @@ object Main extends App {
 
     // Add the movie, but only if it doesn't exist in the database.
     if (getResults(master_collection.find((equal("title", title_as)))).isEmpty) {
-      master_collection.insertOne(Movie(title_as, domestic_gross_a, international_gross_a, budget_a, release_date_string_as, release_date_in_seconds_as, genre_as, director_as, rt_score_a, imdb_score_a, imdb_votes_a))
-      println(s"[Notice]: [$title_as] was not previously found in the database and was added!.\n")
+      getResults(master_collection.insertOne(Movie(title_as, domestic_gross_a, international_gross_a, budget_a, release_date_string_as, release_date_in_seconds_as, genre_as, director_as, rt_score_a, imdb_score_a, imdb_votes_a)))
+      println(s"[Notice]: [$title_as] was not previously found in the database and was added.\n")
       printMenuAndPrompt()
     }
 
@@ -817,18 +818,11 @@ object Main extends App {
           imdb_votes_edit_a = -1
       }
 
-      // Update the movie, but only if it exists in the database.
-      master_collection.updateOne(equal("title", title_to_search_for), combine(set("title", title_edit_as),
-        set("us_gross", domestic_gross_edit_a),
-        set("world_gross", international_gross_edit_a),
-        set("budget", budget_edit_a),
-        set("release_date", release_date_string_as),
-        set("release_date_in_seconds", release_date_in_seconds_as),
-        set("genre", genre_edit_as),
-        set("director", director_edit_as),
-        set("rotten_tomatoes", rt_score_edit_a),
-        set("imdb", imdb_score_edit_a),
-        set("imdb_votes", imdb_votes_edit_a)), upsertFalse)
+      // First remove the existing movie.
+      getResults(master_collection.deleteOne(Filters.equal("title", title_to_search_for)))
+
+      // Afterwards, add the new movie.
+      getResults(master_collection.insertOne(Movie(title_edit_as, domestic_gross_edit_a, international_gross_edit_a, budget_edit_a, release_date_string_as, release_date_in_seconds_as, genre_edit_as, director_edit_as, rt_score_edit_a, imdb_score_edit_a, imdb_votes_edit_a)))
 
       println(s"[Notice]: [$title_to_search_for] was found and edited successfully!\n")
       printMenuAndPrompt()
