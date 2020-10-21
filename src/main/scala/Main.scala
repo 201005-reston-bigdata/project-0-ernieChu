@@ -61,8 +61,8 @@ object Main extends App {
 
   var t9m_b_actual, t9m_e_actual, t9d_b_actual, t9d_e_actual, t9y_b_actual, t9y_e_actual = 0
 
-  // Open the JSON for processing. Currently hardcoded in, can't move the JSON outside of the /src/ directory without changing this.
-  val inputFile: Unit = Source.fromFile("movies.json").getLines.foreach {
+  // Open the JSON for processing. Pass in a command line here once it's finalized.
+  val inputFile: Unit = Source.fromFile("C:\\Users\\Chu\\Desktop\\Movies\\movies.json").getLines.foreach {
     line: String => {
 
       // Increment the line we're checking and reset the number of extra commas and colons we've seen.
@@ -335,10 +335,12 @@ object Main extends App {
 
     // Prints all the documents in the master collection.
     var listOfMovies = getResults(s.find()).toList
+    println()
+    println(s"${listOfMovies.length} movie(s) were found in the collection, shown below.\n")
     for (movie <- listOfMovies) {
       println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
       println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-      println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+      println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
     }
   }
 
@@ -850,7 +852,7 @@ object Main extends App {
 
     // Remove the movie, but only if it exists in the database.
     else {
-      master_collection.deleteOne(Filters.equal("title", title_remove_as))
+      getResults(master_collection.deleteOne(Filters.equal("title", title_remove_as)))
       println(s"[Notice]: [$title_remove_as] was found in the database and removed.\n")
       printMenuAndPrompt()
     }
@@ -879,7 +881,7 @@ object Main extends App {
       case "3" => removeMovie(bookmarks_collection)
       case "4" => printMenuAndPrompt()
       case "5" =>
-        println("Thank you for coming to the MoViEs. Please come again.")
+        println("Thank you for coming to the movies. Please come again.")
         System.exit(0)
       case notRecognized =>
         println(s"[$notRecognized] was not a valid option. Please try again.\n")
@@ -933,7 +935,7 @@ object Main extends App {
       case "4" => directorSearch()
       case "5" => printMenuAndPrompt()
       case "6" =>
-        println("Thank you for coming to the MoViEs. Please come again.")
+        println("Thank you for using [movies].\n")
         mongoClient.close()
         System.exit(0)
       case notRecognized => println(s"[$notRecognized] was not a valid option. Returning to top menu.\n")
@@ -958,51 +960,49 @@ object Main extends App {
 
     // Case 1: Only the title was entered - perform the search and return to the search menu.
     if (genre_string == "") {
-      println()
 
       // Prints all the documents in the master collection.
       var listOfMovies_search_genreNull = getResults((master_collection.find(Filters.equal("title", title_string))))
+      println()
+      println(s"${listOfMovies_search_genreNull.length} movie(s) were found in the collection, shown below.\n")
       for (movie <- listOfMovies_search_genreNull) {
         println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
         println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
       }
 
-      println()
       printFilterMenu()
     }
 
     // Case 2: Only the genre was entered.
     if (title_string == "") {
-      println()
-      println("The results below were found in the master collection.")
 
       // Prints all the documents in the master collection.
       var listOfMovies_search_titleNull = getResults((master_collection.find(Filters.equal("genre", genre_string))))
+      println()
+      println(s"${listOfMovies_search_titleNull.length} movie(s) were found in the collection, shown below.\n")
       for (movie <- listOfMovies_search_titleNull) {
         println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
         println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
       }
 
-      println()
       printFilterMenu()
     }
 
     // Case 3: Both the title and genre were entered.
     if ((genre_string != "") && (title_string != "")) {
-      println()
-      println("The results below were found in the master collection.")
 
       // Prints all the documents in the master collection.
       var listOfMovies_search_neitherNull = getResults((master_collection.find(and(Filters.equal("genre", genre_string), (Filters.equal("title", title_string))))))
+      println()
+      println(s"${listOfMovies_search_neitherNull.length} movie(s) were found in the collection, shown below.\n")
       for (movie <- listOfMovies_search_neitherNull) {
         println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
         println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
       }
 
-      println()
       printFilterMenu()
     }
   }
@@ -1064,40 +1064,38 @@ object Main extends App {
 
     // Switch the bounds if the upper bound ends up higher than the lower bound.
     if (upper_bound <= lower_bound || lower_bound >= upper_bound) {
-      print("The upper bound was lower than the lower bound, so the bounds have now been switched.\n")
+      println("\nDue the reverse input, the upper bound and lower bounds were switched.")
       upper_bound = lower_bound
       lower_bound = upper_bound
     }
 
     if (earnings_type == "1") {
-      println()
-      println("The results below were found in the master collection.")
 
       // Searches for movies that fall in the bounds of the domestic earnings.
-      var listOfMovies_earnings_domestic = getResults((master_collection.find(and(gt("us_gross", lower_bound), lt("us_gross", upper_bound)))))
+      var listOfMovies_earnings_domestic = getResults((master_collection.find(and(gte("us_gross", lower_bound), lte("us_gross", upper_bound)))))
+      println()
+      println(s"${listOfMovies_earnings_domestic.length} movie(s) were found in the collection, shown below.\n")
       for (movie <- listOfMovies_earnings_domestic) {
         println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
         println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
       }
 
-      println()
       printFilterMenu()
     }
 
     if (earnings_type == "2") {
-      println()
-      println("The results below were found in the master collection.")
 
       // Searches for movies that fall in the bounds of the worldwide earnings.
       var listOfMovies_earnings_worldwide = getResults(master_collection.find(and(gt("world_gross", lower_bound), lt("world_gross", upper_bound))))
+      println()
+      println(s"${listOfMovies_earnings_worldwide.length} movie(s) were found in the collection, shown below.\n")
       for (movie <- listOfMovies_earnings_worldwide) {
         println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
         println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
       }
 
-      println()
       printFilterMenu()
     }
   }
@@ -1264,18 +1262,23 @@ object Main extends App {
       lower_bound_in_seconds = (60 * 60 * 24 * 365 * year_ai) + (60 * 60 * 24 * 30 * month_int_a) + (60 * 60 * 24 * day_ai)
       upper_bound_in_seconds = (60 * 60 * 24 * 365 * year_bi) + (60 * 60 * 24 * 30 * month_int_b) + (60 * 60 * 24 * day_bi)
 
-      println()
-      println("The results below were found in the master collection.")
+      // Swtich the lower and upper bounds if they're reversed by some circumstance.
+      if (lower_bound_in_seconds > upper_bound_in_seconds || upper_bound_in_seconds < lower_bound_in_seconds) {
+        println("\nDue the reverse input, the upper bound and lower bounds were switched.")
+        lower_bound_in_seconds = upper_bound_in_seconds
+        upper_bound_in_seconds = lower_bound_in_seconds
+      }
 
       // Search the collection, given the computed bounds.
-      var listOfMovies_date_bounded = getResults(master_collection.find(and(gt("release_date_in_seconds", lower_bound_in_seconds), lt("release_date_in_seconds", upper_bound_in_seconds))))
+      var listOfMovies_date_bounded = getResults(master_collection.find(and(gte("release_date_in_seconds", lower_bound_in_seconds), lte("release_date_in_seconds", upper_bound_in_seconds))))
+      println()
+      println(s"${listOfMovies_date_bounded.length} movie(s) were found in the collection, shown below.\n")
       for (movie <- listOfMovies_date_bounded) {
         println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
         println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
       }
 
-      println()
       printFilterMenu()
     }
 
@@ -1337,20 +1340,18 @@ object Main extends App {
 
       // For testing.
       date_string_e = month_e + " " + day_e + " " + year_ei
-      println(s"The exact date string is [$date_string_e].")
-
-      println()
-      println("The results below were found in the master collection.")
+      // println(s"The exact date string is [$date_string_e].")
 
       // Search the collection, given the computed bounds.
       var listOfMovies_date_exact = getResults(master_collection.find(Filters.equal("release_date", date_string_e)))
+      println()
+      println(s"${listOfMovies_date_exact.length} movie(s) were found in the collection, shown below.\n")
       for (movie <- listOfMovies_date_exact) {
         println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
         println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+        println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
       }
 
-      println()
       printFilterMenu()
     }
   }
@@ -1388,15 +1389,14 @@ object Main extends App {
 
     var combined_namestring = firstname + " " + lastname
 
-    println()
-    println("The results below were found in the master collection.")
-
     // Search the collections on the given director name.
     var listOfMovies_director = getResults(master_collection.find(Filters.equal("director", combined_namestring)))
+    println()
+    println(s"${listOfMovies_director.length} movie(s) were found in the collection, shown below.\n")
     for (movie <- listOfMovies_director) {
       println(s"[${movie.title}] is a [${movie.genre}] movie directed by [${movie.director}] that released on [${movie.release_date}].")
       println(s"It made [${movie.us_gross}] dollars in the US and [${movie.world_gross}] dollars worldwide with a budget of [${movie.budget}] dollars.")
-      println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.")
+      println(s"Overall, it has a Rotten Tomatoes score of [${movie.rotten_tomatoes}], a IMDB rating of [${movie.imdb}], and [${movie.imdb_votes}] IMDB votes.\n")
     }
 
     printFilterMenu()
